@@ -264,7 +264,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     		doPushContextDetection();
     		try 
     		{
-    			Thread.sleep(60000); //one minute
+    			Thread.sleep(5000); //one minute
     			Log.i("Muhaha", "high sleep");
     			if(powerScheme == powerScheme.BALANCED || powerScheme == powerScheme.MANUAL)
     			{
@@ -277,7 +277,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     				Log.i("Muhaha", "saver sleep");
     			}
     		}
-    		catch (InterruptedException e) 
+    		catch (Exception e) 
     		{
 				e.printStackTrace();
 				Log.i("Muhaha", "W00t Error");
@@ -458,18 +458,21 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     private boolean loadSettings(ContextPluginSettings settings) 
     {
 	// Check settings type and store
-	if (settings != null) {
+	if (settings != null) 
+	{
 	    Log.i(TAG, "Received previously stored settings: " + settings);
-	    try {
-		sampleData = settings.get(SAMPLE_DATA_KEY);
-		return true;
+	    try 
+	    {
+	    	sampleData = settings.get(SAMPLE_DATA_KEY);
+	    	return true;
 	    }
-	    catch (Exception e) {
-		Log.w(TAG, "Failed to parse settings: " + e.getMessage());
+	    	catch (Exception e) {
+	    		Log.w(TAG, "Failed to parse settings: " + e.getMessage());
 	    }
 	}
 	else
-	    if (settings == null) {
+	    if (settings == null) 
+	    {
 		// Create default settings
 		Log.i(TAG, "No settings found!");
 	    }
