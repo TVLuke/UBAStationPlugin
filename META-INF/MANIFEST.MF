@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.ambientdynamix.contextplugins.airpolutantsplugin
+Bundle-Version: 1.0.0
+Bundle-Name: Air Polutants Plugin
+Bundle-Vendor: Provider Name
+Import-Package: org.ambientdynamix.application.api,
+ org.ambientdynamix.contextplugin.api,
+ org.ambientdynamix.contextplugin.api.security
+Export-Package: org.ambientdynamix.contextplugins.airpolutantsplugin
