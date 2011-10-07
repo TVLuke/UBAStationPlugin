@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -55,17 +56,13 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 	private LocationManager locationManager;
 	private String provider;
 	private ArrayList stations = new ArrayList(); //this list will probably eplace all the other station lists
-	//private ArrayList stationnames = new ArrayList();
-	//private ArrayList stationlocation = new ArrayList();
-	//private ArrayList stationdescription = new ArrayList();
 	private ArrayList codes = new ArrayList();
 	private ArrayList units = new ArrayList();
 	private ArrayList limits = new ArrayList();
 	private ArrayList description = new ArrayList();
 	private ArrayList states = new ArrayList();
-	double[] values= new double[5]; //values[1] = ozone; values[2] = Particulates...
-	double[] distances = new double[5]; //The distances from which these vaues are taken
-    
+	Measurement[] values= new Measurement[5]; //values[1] = ozone; values[2] = Particulates...
+    double[] distances = new double[5];
 	@Override
     public void init(PluginPowerScheme scheme, ContextPluginSettings settings) throws Exception 
     {
@@ -78,8 +75,8 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     		//set up values
     		for(int i=0; i<values.length; i++)
     		{
-    			values[i]=-999.9; //-999.9 is the dafault value.
-    			distances[i]=-999.9;
+    			Measurement m1 = new Measurement();
+    			values[i]=m1; //-999.9 is the dafault value.
     		}
     		Log.i("Muhaha", "whatup");
     		//Codes for Polutants
@@ -135,7 +132,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 		    // Since failed to load our settings, tell Dynamix we're not configured.
 		    getAndroidFacade().setPluginConfiguredStatus(getSessionId(), false);
 		}
-		Log.i("Muhaha", "done with init");
+		//Log.i("Muhaha", "done with init");
     }
 
 	@Override
@@ -188,6 +185,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     				Log.i("Muhaha", "unable to get actual location.");
     			}
     		}
+    		Log.i("Muhaha", "OKTORUNÖÖÖLLLKKK="+okToRun);
     		//get the station that is closest
     		Log.i("Muhaha", "got location"+location.getLatitude());
     		double distance=0.0;
@@ -203,6 +201,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     		}
     		//the process is incomplete as long as there are values unset (if there are no stations left, the process is complete to)
     		Log.i("Muhaha", "go");
+    		Log.i("Muhaha", "OKTORUNNNNN="+okToRun);
     		while(incomplete)
     		{
     			aNumber=0;
@@ -253,29 +252,36 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 	    		}
     		}
     		//put newvalues into values (unless its -999.9)
+    		Log.i("Muhaha", "OKTORUNaaaaa="+okToRun);
     		for(int i=0; i<newvalues.length; i++)
     		{
     			if(!(newvalues[i]==-999.9))
     			{
+    				Date d = new Date();
+    				String ax=(String)codes.get(i);
+    				String bx = (String) units.get(i);
     				//Here should be a check if a limit was exeeded, if so, there should be a push context, if not, not.
-    				values[i]=newvalues[i];
+    				values[i].update(ax, newvalues[i], bx, station, d, distances[i]);
     			}
     		}
+    		Log.i("Muhaha", "OKTORUNasas="+okToRun);
     		doPushContextDetection();
+    		Log.i("Muhaha", "OKTORUNfffff="+okToRun);
     		try 
     		{
     			Thread.sleep(5000); //one minute
     			Log.i("Muhaha", "high sleep");
     			if(powerScheme == powerScheme.BALANCED || powerScheme == powerScheme.MANUAL)
     			{
-    				Thread.sleep(5000); //five minutes
+    				Thread.sleep(295000); //five minutes
     				Log.i("Muhaha", "balanced sleep");
     			}
     			if(powerScheme == powerScheme.POWER_SAVER)
     			{
-    				Thread.sleep(5000); //three hours
+    				Thread.sleep(10500000); //three hours
     				Log.i("Muhaha", "saver sleep");
     			}
+        		Log.i("Muhaha", "OKTORUNererer="+okToRun);
     		}
     		catch (Exception e) 
     		{
@@ -345,9 +351,8 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 		 */
 		if (getState() == PluginState.STARTED) 
 		{
-			String message=createMessage();
 		    Log.i(TAG, "handleContextRequest for requestId: " + requestId);
-		    pullEventHelper(message, requestId, EVENT_VALID_MILLS);
+		    pullEventHelper("", requestId, EVENT_VALID_MILLS);
 		    
 		}
 		else
@@ -364,9 +369,8 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 	 */
 	if (getState() == PluginState.STARTED) 
 	{
-		String message = createMessage();
 	    Log.i(TAG, "handleConfiguredContextRequest for requestId: " + requestId);
-	    pullEventHelper(message, requestId, EVENT_VALID_MILLS);
+	    pullEventHelper("", requestId, EVENT_VALID_MILLS);
 	}
 	else
 	    Log.w(TAG, "Cannot handleContextRequest from " + getState());
@@ -394,8 +398,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     @Override
     public void doManualContextScan() 
     {
-    	String message=createMessage();
-	    pushEventHelper(message, EVENT_VALID_MILLS);
+	    pushEventHelper("", EVENT_VALID_MILLS);
     }
 
     @Override
@@ -420,9 +423,8 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     private void doPushContextDetection() 
     {
 		Log.i("Muhaha", "Entering doPushContextDetection");
-		String message=createMessage();
 	    // Send a sample broadcast event
-	    pushEventHelper(message, EVENT_VALID_MILLS);
+	    pushEventHelper("", EVENT_VALID_MILLS);
 	    Log.i("Muhaha", "Exiting doPushContextDetection");
     }
 
@@ -447,8 +449,9 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
      */
     private List<SecuredContextInfo> constructEventList(String message) 
     {
+    	MeasurementList m = new MeasurementList(values);
 		List<SecuredContextInfo> eventList = new Vector<SecuredContextInfo>();
-		eventList.add(new SecuredContextInfo(new AirPolutantsPluginContextinfo(message), FidelityLevel.LOW));
+		eventList.add(new SecuredContextInfo(new AirPolutantsPluginContextinfo(m), FidelityLevel.LOW));
 		return eventList;
     }
 
@@ -478,24 +481,6 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 	    }
 	return false;
     }
-    
-    private String createMessage() 
-    {
-    	String message="";
-    	Log.i("Muhaha", "Create Message");
-    	for(int i=0; i<values.length; i++)
-		{
-			if(i<values.length-1)
-			{
-				message=message+codes.get(i)+":"+values[i]+" "+units.get(i)+" ("+distances[i]+" meters);";
-			}
-			else
-			{
-				message=message+codes.get(i)+":"+values[i]+" "+units.get(i)+" ("+distances[i]+" meters)";				
-			}
-		}
-    	return message;
-	}
     
     private void setupstaions() 
     {

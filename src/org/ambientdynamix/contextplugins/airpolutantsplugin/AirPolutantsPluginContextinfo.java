@@ -15,7 +15,9 @@
  */
 package org.ambientdynamix.contextplugins.airpolutantsplugin;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.ambientdynamix.application.api.IContextInfo;
@@ -40,9 +42,9 @@ public class AirPolutantsPluginContextinfo implements IContextInfo
     };
     
     // Sample context data
-    private String contextData;
+    private MeasurementList contextData;
 
-    public String getSampleData() 
+    public MeasurementList getSampleData() 
     {
     	return contextData;
     }
@@ -62,7 +64,19 @@ public class AirPolutantsPluginContextinfo implements IContextInfo
     @Override
     public String getStringRepresentation(String format) 
     {
-    	return contextData;
+    	
+    	String result="";
+    	List m = contextData.getMeasurements();
+    	for(int i=0; i<m.size(); i++)
+    	{
+    		if(i>0)
+    		{
+    			result=result+"; ";
+    		}
+    		Measurement m1 = (Measurement) m.get(i);
+    		result=result+m1.getName()+" "+m1.getValue()+" "+m1.getUnit()+" ("+m1.getDistance()+" meters)";
+    	}
+    	return result;
     }
 
     @Override
@@ -79,14 +93,14 @@ public class AirPolutantsPluginContextinfo implements IContextInfo
     	return formats;
     };
 
-    public AirPolutantsPluginContextinfo(String contextData) 
+    public AirPolutantsPluginContextinfo(MeasurementList m) 
     {
-    	this.contextData = contextData;
+    	this.contextData = m;
     }
 
     private AirPolutantsPluginContextinfo(final Parcel in) 
     {
-    	this.contextData = in.readString();
+    	this.contextData = in.readParcelable(getClass().getClassLoader());
     }
 
     public IBinder asBinder() 
@@ -101,6 +115,6 @@ public class AirPolutantsPluginContextinfo implements IContextInfo
 
     public void writeToParcel(Parcel out, int flags) 
     {
-    	out.writeString(this.contextData);
+    	out.writeParcelable(this.contextData, flags);
     }
 }
