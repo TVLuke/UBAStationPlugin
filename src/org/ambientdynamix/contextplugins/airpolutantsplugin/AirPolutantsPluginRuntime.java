@@ -63,15 +63,13 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 	private ArrayList states = new ArrayList();
 	Measurement[] values= new Measurement[5]; //values[1] = ozone; values[2] = Particulates...
     double[] distances = new double[5];
+    
 	@Override
     public void init(PluginPowerScheme scheme, ContextPluginSettings settings) throws Exception 
     {
-    	if (getState() == PluginState.NEW)
-    	{
     		// Setup new state
     		Log.i("Muhaha", "INIT");
     		this.setPowerScheme(scheme);
-    		setState(PluginState.INITIALIZED);
     		//set up values
     		for(int i=0; i<values.length; i++)
     		{
@@ -114,11 +112,6 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     		//states.add("TH");
     		//states.add("UB");
         	setupstaions();    
-    	}
-    	else
-    	{
-    		throw new Exception("Cannot init from state: " + getState());
-    	}
 		/*
 		 * Try to load our settings. Note: init can be called when we're NEW and INITIALIZED (during updates)
 		 */
@@ -149,20 +142,10 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 		}
 		okToRun=true;
 		Log.i("Muhaha", "The wait is over");
-    	if (getState() == PluginState.INITIALIZED) 
-    	{
-		    setState(PluginState.STARTED);
-    		Log.i("Muhaha", "Switch to started");
-    	}
     	while(okToRun)
     	{
     		Log.i("Muhaha", "OK TO RUN");
 			boolean incomplete=true;
-    		if(!(getState() == PluginState.STARTED))
-    		{
-    			okToRun=false;
-    			Log.i("Muhaha", "NOT OK TO RUN");
-    		}
     		Log.i("Muhaha", "OKTORUN="+okToRun);
     		// Get the location manager
     		String context = Context.LOCATION_SERVICE;
@@ -234,7 +217,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     			}
 	    		//Here the readout happens
 	    		//Log.i("Muhaha", "readout"+station);
-	    		readout(newvalues, station.getStationID(), distance);
+	    		readout(newvalues, station, distance);
 	    		//then the stationname is deleted out of names2
 	    		stations2.remove(aNumber);
 	    		//check if there is an unfilled value in the newvalues array
@@ -294,53 +277,10 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     	Log.i("Muhaha", "out");
     }
 
-    private void readout(double[] newvalues, String station, double distance) 
+    private void readout(double[] newvalues, Station station, double distance) 
     {
-    	//All the different codes for measurements
-    	String state=getState(station);
-    	//determine the State String based on the name of the station
-    	for(int i=0; i<codes.size(); i++) //do a readout of the sensors for every type of value
-    	{
-		    String vv="";
-    		try
-    		{
-	    		String url = "http://www.env-it.de/luftdaten/statedata.csv?comp="+codes.get(i)+"&state="+state;
-				URL theurl = new URL(url);
-				URLConnection yc = theurl.openConnection();
-				BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
-				String inputLine;
-				int linenumber=0;
-				while ((inputLine = in.readLine()) != null)
-				{	
-					StringTokenizer tk = new StringTokenizer(inputLine, ";");
-					while(tk.hasMoreTokens())
-					{
-						if(tk.nextToken().equals(station))
-						{
-							tk.nextToken();
-							vv= tk.nextToken();
-						}
-					}
-					//System.out.println(inputLine);
-				}
-				in.close();
-    		}
-    		catch(Exception e)
-    		{
-    			
-    		}
-    		if(!(vv.equals(""))) //some value has been detected
-    		{
-    			if(newvalues[i]==-999.9) //there is no value in the array yet.
-    			{
-    				Log.i("Muhaha", "New Value");
-    				double vx= Double.parseDouble(vv);
-    				newvalues[i]=vx;//now there is.
-    				distances[i]=distance;
-    			}
-    		}
-    	}
-		
+		newvalues= station.sense(newvalues, codes);
+    	//find the parts where it sais -999.9 in the distances but not in newvalues, change that to distance
 	}
 
 	@Override
@@ -349,16 +289,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 		/*
 		 * Perform context scan without configuration.
 		 */
-		if (getState() == PluginState.STARTED) 
-		{
-		    Log.i(TAG, "handleContextRequest for requestId: " + requestId);
-		    pullEventHelper("", requestId, EVENT_VALID_MILLS);
-		    
-		}
-		else
-		{
-		    Log.w(TAG, "Cannot handleContextRequest from " + getState());
-		}
+	    pullEventHelper("", requestId, EVENT_VALID_MILLS);
     }
 
     @Override
@@ -367,13 +298,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 	/*
 	 * Use the incoming scanConfig Bundle to control how we perform the context scan.
 	 */
-	if (getState() == PluginState.STARTED) 
-	{
 	    Log.i(TAG, "handleConfiguredContextRequest for requestId: " + requestId);
-	    pullEventHelper("", requestId, EVENT_VALID_MILLS);
-	}
-	else
-	    Log.w(TAG, "Cannot handleContextRequest from " + getState());
     }
 
     @Override
@@ -382,7 +307,6 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 		okToRun = false;
 		Thread t=Thread.currentThread();
 		t.interrupt();  
-		setState(PluginState.INITIALIZED);
 		Log.d(TAG, "Stopped!");
 		Log.d("Muhaha", "Stopped!111");
     }
@@ -391,7 +315,6 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     public void destroy() 
     {
 		stop();
-		setState(PluginState.DESTROYED);
 		Log.i(TAG, this + " is Destroyed!");
     }
 
@@ -736,74 +659,5 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 	    	}	
     	}
 		Log.i("Muhaha", ""+stations.size());
-	}
-    
-	private String getState(String station) 
-	{
-		if(station.startsWith("DEBW")) //Baden Württemberg
-    	{
-    		return "BW";
-    	}
-		if(station.startsWith("DEBY")) //Bayern
-    	{
-    		return "BY";
-    	}
-		if(station.startsWith("DEBE")) //Berin
-    	{
-    		return "BE";
-    	}
-		if(station.startsWith("DEBB")) //Brandenburg
-    	{
-    		return "BB";
-    	}		
-		if(station.startsWith("DEHB")) //Bremen
-    	{
-    		return "HB";
-    	}		
-    	if(station.startsWith("DEHH")) //Hamburg
-    	{
-    		return "HH";
-    	}
-		if(station.startsWith("DEHE")) //Hessen
-    	{
-    		return "HE";
-    	}		
-		if(station.startsWith("DEMV"))
-    	{
-    		return "MV";
-    	}		
-		if(station.startsWith("DENI"))
-    	{
-    		return "NI";
-    	}
-		if(station.startsWith("DERP"))
-    	{
-    		return "RP";
-    	}
-		if(station.startsWith("DESL"))
-    	{
-    		return "SL";
-    	}
-		if(station.startsWith("DESN"))
-    	{
-    		return "SN";
-    	}
-		if(station.startsWith("DEST"))
-    	{
-    		return "ST";
-    	}
-    	if(station.startsWith("DESH")) //Schleswig Holstein
-    	{
-    		return "SH";
-    	}
-    	if(station.startsWith("DETH")) //Thüringen
-    	{
-    		return "TH";
-    	}
-    	if(station.startsWith("DEUB")) //Umweltbundesamt
-    	{
-    		return "UB";
-    	}
-    	return "";
 	}
 }

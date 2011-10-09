@@ -1,5 +1,7 @@
 package org.ambientdynamix.contextplugins.airpolutantsplugin;
 
+import java.util.ArrayList;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -7,7 +9,7 @@ import android.location.Location;
 
 public class Station implements Parcelable 
 {
-	private String stationid = "";
+	protected String stationid = "";
 	private String stationname="";
 	private double stationlatitude=0.0;
 	private double stationlongitude=0.0;
@@ -91,7 +93,10 @@ public class Station implements Parcelable
 		stationaltitude=location.getAltitude();
     }
     
-    
+    public double[] sense(double[] newvalues, ArrayList codes)
+    {
+    	return newvalues;
+    }
     
 	@Override
 	public int describeContents() 

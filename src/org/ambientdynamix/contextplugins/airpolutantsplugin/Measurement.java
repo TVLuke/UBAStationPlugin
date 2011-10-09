@@ -10,7 +10,7 @@ public class Measurement implements Parcelable
 	String name="";
 	double value=-999.9;
 	String unit="";
-	Station station= new Station("FakeStation");
+	Station station;
 	long date = 0;
 	double distance=0.0;
 	
