@@ -1,17 +1,9 @@
 /*
- * Copyright (C) the Dynamix Framework Project (well, whatever)
+ * This Plugin is licensed under GNU GPL v3 
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *      http://www.gnu.org/licenses/gpl.html
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *Author: Luaks Ruge
  */
 package org.ambientdynamix.contextplugins.airpolutantsplugin;
 
@@ -31,7 +23,7 @@ import org.ambientdynamix.contextplugin.api.ContextPluginSettings;
 import org.ambientdynamix.contextplugin.api.PluginPowerScheme;
 import org.ambientdynamix.contextplugin.api.PluginState;
 import org.ambientdynamix.contextplugin.api.PushPullContextPluginRuntime;
-import org.ambientdynamix.contextplugin.api.security.FidelityLevel;
+import org.ambientdynamix.contextplugin.api.security.PrivacyRiskLevel;
 import org.ambientdynamix.contextplugin.api.security.SecuredContextInfo;
 
 import android.content.Context;
@@ -374,7 +366,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     {
     	MeasurementList m = new MeasurementList(values);
 		List<SecuredContextInfo> eventList = new Vector<SecuredContextInfo>();
-		eventList.add(new SecuredContextInfo(new AirPolutantsPluginContextinfo(m), FidelityLevel.LOW));
+		eventList.add(new SecuredContextInfo(new AirPolutantsPluginContextinfo(m), PrivacyRiskLevel.LOW));
 		return eventList;
     }
 
@@ -434,7 +426,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 	    			stationcode="DE"+state+""+code;
 	    		}
 	    		code++;
-	    		Station station= new Station(stationcode);
+	    		BUDStation station= new BUDStation(stationcode);
 	    		//Log.i("Muhaha", stationcode);
 		    	try
 				{
