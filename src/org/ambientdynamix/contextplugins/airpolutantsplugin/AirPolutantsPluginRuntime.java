@@ -87,22 +87,22 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
         	units.add("µg/m^3");
         	limits.add(200.0);
     		//set up station data
-    		//states.add("BW");
-    		//states.add("BY");
-    		//states.add("BE");
-    		//states.add("BB");
-    		//states.add("HB");
-    		//states.add("HH");
-    		//states.add("HE");
-    		//states.add("MV");
-    		//states.add("NI");
-    		//states.add("RP");
-    		//states.add("SL");
-    		//states.add("SN");
-    		//states.add("ST");
+    		states.add("BW");
+    		states.add("BY");
+    		states.add("BE");
+    		states.add("BB");
+    		states.add("HB");
+    		states.add("HH");
+    		states.add("HE");
+    		states.add("MV");
+    		states.add("NI");
+    		states.add("RP");
+    		states.add("SL");
+    		states.add("SN");
+    		states.add("ST");
     		states.add("SH");
-    		//states.add("TH");
-    		//states.add("UB");
+    		states.add("TH");
+    		states.add("UB");
         	setupstaions();    
 		/*
 		 * Try to load our settings. Note: init can be called when we're NEW and INITIALIZED (during updates)
