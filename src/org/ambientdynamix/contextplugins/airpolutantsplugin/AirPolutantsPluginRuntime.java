@@ -140,7 +140,6 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 			boolean incomplete=true;
     		Log.i("Muhaha", "OKTORUN="+okToRun);
     		// Get the location manager
-    		String context = Context.LOCATION_SERVICE;
     		locationManager = (LocationManager) getSecuredContext().getSystemService(Context.LOCATION_SERVICE);
     		//Define the criteria how to select the locatioin provider -> use
     		// default
@@ -151,7 +150,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     		while((location==null && sn<500) || (location.getLatitude()==0.0 && location.getLongitude()==0.0))
     		{
     			sn++;
-    			Log.i("Muhaha", "search for location");
+    			Log.i("Muhaha", sn+" search for location");
     			location = locationManager.getLastKnownLocation(provider);
     			if(sn==499)
     			{
@@ -220,6 +219,13 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
 	    			{
 	    				unfilled=true;
 	    			}
+	    			else
+	    			{
+		    			if(distances[j]==0)
+		    			{
+		    				distances[j]=distance;
+		    			}
+	    			}
 	    		}
 	    		if(stations2.size()==0 || !unfilled)
 	    		{
@@ -239,9 +245,7 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     				values[i].update(ax, newvalues[i], bx, station, d, distances[i]);
     			}
     		}
-    		Log.i("Muhaha", "OKTORUNasas="+okToRun);
     		doPushContextDetection();
-    		Log.i("Muhaha", "OKTORUNfffff="+okToRun);
     		try 
     		{
     			Thread.sleep(5000); //one minute
