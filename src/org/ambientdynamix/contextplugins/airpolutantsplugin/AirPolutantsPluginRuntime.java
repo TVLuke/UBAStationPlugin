@@ -250,12 +250,12 @@ public class AirPolutantsPluginRuntime extends PushPullContextPluginRuntime {
     		{
     			Thread.sleep(5000); //one minute
     			Log.i("Muhaha", "high sleep");
-    			if(powerScheme == powerScheme.BALANCED || powerScheme == powerScheme.MANUAL)
+    			if(powerScheme == PluginPowerScheme.BALANCED || powerScheme == PluginPowerScheme.MANUAL)
     			{
     				Thread.sleep(295000); //five minutes
     				Log.i("Muhaha", "balanced sleep");
     			}
-    			if(powerScheme == powerScheme.POWER_SAVER)
+    			if(powerScheme == PluginPowerScheme.POWER_SAVER)
     			{
     				Thread.sleep(10500000); //three hours
     				Log.i("Muhaha", "saver sleep");
