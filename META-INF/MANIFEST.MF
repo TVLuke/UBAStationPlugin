@@ -1,10 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-SymbolicName: org.ambientdynamix.contextplugins.airpolutantsplugin
-Bundle-Version: 1.0.2
+Bundle-SymbolicName: org.ambientdynamix.contextplugins.ubastationplugin
+Bundle-Version: 1.0.3
 Bundle-Name: Air Polutants Plugin
 Bundle-Vendor: Provider Name
-Import-Package: org.ambientdynamix.application.api,
- org.ambientdynamix.contextplugin.api,
- org.ambientdynamix.contextplugin.api.security
-Export-Package: org.ambientdynamix.contextplugins.airpolutantsplugin
+Import-Package: org.ambientdynamix.api.application,
+ org.ambientdynamix.api.contextplugin,
+ org.ambientdynamix.api.contextplugin.security
+DynamicImport-Package: *
+Export-Package: org.ambientdynamix.contextplugins.ubastationplugin
+
