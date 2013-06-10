@@ -569,9 +569,10 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 										Log.i("Muhaha", "dezimal");
 										String a= tk.nextToken();
 										//Log.i("Muhaha","a="+a);
+										a = a.replace(",", ".");
 									    vLogitude = Double.parseDouble(a);
 									    String b = tk.nextToken();
-									    //Log.i("Muhaha","b="+b);
+										b = b.replace(",", ".");
 									    vLatitude = Double.parseDouble(b);
 										//vv= tk.nextToken();
 									}
@@ -579,6 +580,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									{
 										Log.i("Muhaha", "höhe");
 										String a= tk.nextToken();
+										a = a.replace(",", ".");
 										//Log.i("Muhaha","a2="+a);
 									    vAltitude = Double.parseDouble(a);
 										//vv= tk.nextToken();
@@ -619,8 +621,9 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 								}
 								if(!(sensorx.equals("")))
 								{
-									if(theline.contains("Messdauer") && inputLine.contains("Referenced period"))
+									if(theline.contains("Messdauer") || inputLine.contains("Bezugszeitraum"))
 									{
+										Log.i("Muhaha", "Messdauer");
 										String text="";
 										double period=0.0;
 										String aggregationMethod="";
@@ -639,7 +642,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 										
 										Log.i("Muhaha", stationcode+">"+text);
 									}
-									if(theline.contains("method") && inputLine.contains("Sampling method"))
+									if(theline.contains("Mess-/ Probenahmemethode"))
 									{
 										String text="";
 										while(tk.hasMoreTokens())
@@ -648,7 +651,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 										}
 										Log.i("Muhaha", stationcode+">"+text);
 									}
-									if(theline.contains("frequency") && inputLine.contains("Sampling frequency"))
+									if(theline.contains("Messfrequenz") || inputLine.contains("Probenahmefrequenz"))
 									{
 										String text="";
 										while(tk.hasMoreTokens())
