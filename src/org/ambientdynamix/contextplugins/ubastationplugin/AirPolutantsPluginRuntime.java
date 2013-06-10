@@ -103,7 +103,13 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
     		states.add("SH");
     		states.add("TH");
     		states.add("UB");
-        	setupstaions();    
+    		new Thread(new Runnable() 
+	    	{
+	    	    public void run() 
+	    	    {
+	    	    	setupstaions();
+	    	    }
+	    	}).start();
 		/*
 		 * Try to load our settings. Note: init can be called when we're NEW and INITIALIZED (during updates)
 		 */
@@ -407,12 +413,14 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 		Log.i("Muhaha", "Set Up Stations");
 		for(int i=0; i<states.size(); i++)
     	{
+			Log.i("Muhaha", "outer for loop "+i);
     		String state=(String) states.get(i);
     		//Log.i("Muhaha", state);
     		int code=1;
     		boolean more=true;
 	    	while(more && code<200)
 	    	{
+	    		Log.i("Muhaha", "while more "+code);
 	    		String stationcode="";
 	    		double vLogitude=0.0;
 	    		double vLatitude=0.0;
@@ -431,11 +439,14 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 	    			stationcode="DE"+state+""+code;
 	    		}
 	    		code++;
+	    		Log.i("Muhaha", "stationcode "+stationcode);
 	    		UBAStation station= new UBAStation(stationcode);
 	    		//Log.i("Muhaha", stationcode);
 		    	try
 				{
+		    		
 		    		String url = "http://www.env-it.de/stationen/public/download.do?event=downloadStation&stationcodeForDownload="+stationcode;
+		    		Log.i("Muhaha", "try "+url);
 					URL theurl = new URL(url);
 					URLConnection yc = theurl.openConnection();
 					BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
@@ -444,6 +455,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 					boolean documentstart=false;
 					while ((inputLine = in.readLine()) != null)
 					{	
+						Log.i("Muhaha", "line "+inputLine);
 						boolean newsensor=false;
 						boolean relevant=true;
 						if(inputLine.contains("No accepted data"))
@@ -656,5 +668,6 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 	    	}	
     	}
 		Log.i("Muhaha", ""+stations.size());
+		this.getPluginFacade().setPluginConfiguredStatus(getSessionId(), true);
 	}
 }
