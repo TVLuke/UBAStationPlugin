@@ -506,6 +506,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 								{
 									if(theline.contains("Stationsname"))
 									{
+										Log.i("Muhaha", "name");
 										String stationname="";
 										while(tk.hasMoreTokens())
 										{
@@ -518,6 +519,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									}
 									if(theline.contains("Aktuelle Aktivitätsperiode: von"))
 									{
+										Log.i("Muhaha", "aktivität von");
 										tk.nextToken();
 										tk.nextToken();
 										tk.nextToken();
@@ -526,6 +528,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									}
 									if(theline.contains("Aktuelle Aktivitätsperiode: bis"))
 									{
+										Log.i("Muhaha", "aktivität bis");
 										tk.nextToken();
 										tk.nextToken();
 										tk.nextToken();
@@ -542,6 +545,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									}
 									if(theline.contains("Straße"))
 									{
+										Log.i("Muhaha", "straße");
 										String streetname="";
 										while(tk.hasMoreTokens())
 										{
@@ -552,6 +556,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									}
 									if(theline.contains("PLZ"))
 									{
+										Log.i("Muhaha", "plz");
 										String zip=tk.nextToken();
 										station.setzipcode(zip);
 										tk.nextToken();
@@ -561,6 +566,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									}
 									if(theline.contains("Dezimal"))
 									{
+										Log.i("Muhaha", "dezimal");
 										String a= tk.nextToken();
 										//Log.i("Muhaha","a="+a);
 									    vLogitude = Double.parseDouble(a);
@@ -571,12 +577,13 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									}
 									if(theline.contains("Höhe") && !(inputLine.contains("Höhe über")))
 									{
+										Log.i("Muhaha", "höhe");
 										String a= tk.nextToken();
 										//Log.i("Muhaha","a2="+a);
 									    vAltitude = Double.parseDouble(a);
 										//vv= tk.nextToken();
 									}
-									if(theline.contains("area"))
+									if(theline.contains("Ort"))
 									{
 										tk.nextToken();
 										String type=tk.nextToken();
@@ -607,12 +614,12 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									{
 										s=s+" "+tk.nextToken();
 									}
-									Log.i("Muhaha", stationcode+">"+s);
+									Log.i("Muhaha", stationcode+">>"+s);
 									sensorx=s;
 								}
 								if(!(sensorx.equals("")))
 								{
-									if(theline.contains("period") && inputLine.contains("Referenced period"))
+									if(theline.contains("Messdauer") && inputLine.contains("Referenced period"))
 									{
 										String text="";
 										double period=0.0;
