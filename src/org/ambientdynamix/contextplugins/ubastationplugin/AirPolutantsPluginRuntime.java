@@ -371,7 +371,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
     {
     	MeasurementList m = new MeasurementList(values);
 		List<SecuredContextInfo> eventList = new Vector<SecuredContextInfo>();
-		eventList.add(new SecuredContextInfo(new AirPolutantsPluginContextinfo(m), PrivacyRiskLevel.LOW));
+		eventList.add(new SecuredContextInfo(new UBAStationPluginContextinfo(m), PrivacyRiskLevel.LOW));
 		return eventList;
     }
 

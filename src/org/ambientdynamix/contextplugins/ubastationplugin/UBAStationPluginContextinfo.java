@@ -18,18 +18,18 @@ import android.os.Parcelable;
 
 import org.ambientdynamix.contextplugins.context.info.environment.ICarbonMonoxideContextInfo;
 
-public class AirPolutantsPluginContextinfo implements ICarbonMonoxideContextInfo
+public class UBAStationPluginContextinfo implements ICarbonMonoxideContextInfo
 {
-    public static Parcelable.Creator<AirPolutantsPluginContextinfo> CREATOR = new Parcelable.Creator<AirPolutantsPluginContextinfo>() 
+    public static Parcelable.Creator<UBAStationPluginContextinfo> CREATOR = new Parcelable.Creator<UBAStationPluginContextinfo>() 
     {
-    	public AirPolutantsPluginContextinfo createFromParcel(Parcel in) 
+    	public UBAStationPluginContextinfo createFromParcel(Parcel in) 
     	{
-    		return new AirPolutantsPluginContextinfo(in);
+    		return new UBAStationPluginContextinfo(in);
     	}
 
-    	public AirPolutantsPluginContextinfo[] newArray(int size) 
+    	public UBAStationPluginContextinfo[] newArray(int size) 
     	{
-    		return new AirPolutantsPluginContextinfo[size];
+    		return new UBAStationPluginContextinfo[size];
     	}
     };
     
@@ -85,12 +85,12 @@ public class AirPolutantsPluginContextinfo implements ICarbonMonoxideContextInfo
     	return formats;
     };
 
-    public AirPolutantsPluginContextinfo(MeasurementList m) 
+    public UBAStationPluginContextinfo(MeasurementList m) 
     {
     	this.contextData = m;
     }
 
-    private AirPolutantsPluginContextinfo(final Parcel in) 
+    private UBAStationPluginContextinfo(final Parcel in) 
     {
     	this.contextData = in.readParcelable(getClass().getClassLoader());
     }
