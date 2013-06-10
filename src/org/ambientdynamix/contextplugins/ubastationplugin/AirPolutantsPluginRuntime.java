@@ -455,14 +455,14 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 					boolean documentstart=false;
 					while ((inputLine = in.readLine()) != null)
 					{	
-						Log.i("Muhaha", "line "+inputLine);
+						//Log.i("Muhaha", "line "+inputLine);
 						boolean newsensor=false;
 						boolean relevant=true;
 						if(inputLine.contains("No accepted data"))
 						{
 							relevant=false;
 						}
-						if(inputLine.contains("Stationname"))
+						if(inputLine.contains("Stationsname"))
 						{
 							documentstart=true;
 						}
@@ -484,6 +484,12 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 							inputLine= inputLine.replace("\\cell", "");
 							inputLine= inputLine.replace("\\row", "");
 							inputLine= inputLine.replace("\\pard", "");
+							inputLine= inputLine.replace("Times New Roman", "");
+							inputLine= inputLine.replace("\\ansi", "");
+							inputLine= inputLine.replace("\\rtf1", "");
+							inputLine= inputLine.replace(";", "");
+							inputLine= inputLine.replace("\\b", "");
+
 							StringTokenizer tk = new StringTokenizer(inputLine, " ");
 							while(tk.hasMoreTokens())
 							{
@@ -491,20 +497,26 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 								//Stationcode stationcode
 								//
 								String theline=tk.nextToken();
+								if(theline.startsWith("\\"))
+								{
+									break;
+								}
 								//the specific device, but not a specific sensor of the device
 								if((sensorx.equals("")))
 								{
-									if(theline.contains("Stationname"))
+									if(theline.contains("Stationsname"))
 									{
 										String stationname="";
 										while(tk.hasMoreTokens())
 										{
 											stationname=stationname+" "+tk.nextToken();
+											
 										}
 										Log.i("Muhaha", stationcode+">"+stationname);
 										station.setStationName(stationname);
+										Log.i("Muhaha", "station "+stationname);
 									}
-									if(theline.contains("First"))
+									if(theline.contains("Aktuelle Aktivitätsperiode: von"))
 									{
 										tk.nextToken();
 										tk.nextToken();
@@ -512,7 +524,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 										String datum1=tk.nextToken();
 										station.setfirstmeasurement(datum1);
 									}
-									if(theline.contains("Last"))
+									if(theline.contains("Aktuelle Aktivitätsperiode: bis"))
 									{
 										tk.nextToken();
 										tk.nextToken();
@@ -528,7 +540,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 											Log.i("Muhaha", stationcode+"> open");
 										}
 									}
-									if(theline.contains("Street"))
+									if(theline.contains("Straße"))
 									{
 										String streetname="";
 										while(tk.hasMoreTokens())
@@ -538,7 +550,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 										station.setstreetadress(streetname);
 										Log.i("Muhaha", stationcode+">"+streetname);
 									}
-									if(theline.contains("ZIP"))
+									if(theline.contains("PLZ"))
 									{
 										String zip=tk.nextToken();
 										station.setzipcode(zip);
@@ -547,7 +559,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 										station.setcity(city);
 										Log.i("Muhaha", stationcode+">"+zip+","+city);
 									}
-									if(theline.contains("Decimal"))
+									if(theline.contains("Dezimal"))
 									{
 										String a= tk.nextToken();
 										//Log.i("Muhaha","a="+a);
@@ -557,7 +569,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									    vLatitude = Double.parseDouble(b);
 										//vv= tk.nextToken();
 									}
-									if(theline.contains("Altitude") && !(inputLine.contains("Altitude above")))
+									if(theline.contains("Höhe") && !(inputLine.contains("Höhe über")))
 									{
 										String a= tk.nextToken();
 										//Log.i("Muhaha","a2="+a);
@@ -570,13 +582,13 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 										String type=tk.nextToken();
 										station.setareatype(type);
 									}
-									if(theline.contains("station") && inputLine.contains("Type of the station"))
+									if(theline.contains("Station") && inputLine.contains("Art der Station"))
 									{
 										tk.nextToken();
 										String type=tk.nextToken();
 										station.setstationtype(type);
 									}
-									if(theline.contains("carrier"))
+									if(theline.contains("Bemerkung des Netzbetreibers"))
 									{
 										String remark="";
 										while(tk.hasMoreTokens())
