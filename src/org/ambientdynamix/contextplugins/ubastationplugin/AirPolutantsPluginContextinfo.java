@@ -16,7 +16,9 @@ import android.os.IBinder;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class AirPolutantsPluginContextinfo implements org.ambientdynamix.api.application.IContextInfo 
+import org.ambientdynamix.contextplugins.context.info.environment.ICarbonMonoxideContextInfo;
+
+public class AirPolutantsPluginContextinfo implements ICarbonMonoxideContextInfo
 {
     public static Parcelable.Creator<AirPolutantsPluginContextinfo> CREATOR = new Parcelable.Creator<AirPolutantsPluginContextinfo>() 
     {
@@ -107,4 +109,11 @@ public class AirPolutantsPluginContextinfo implements org.ambientdynamix.api.app
     {
     	out.writeParcelable(this.contextData, flags);
     }
+
+	@Override
+	public double[] getCOValue() 
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
