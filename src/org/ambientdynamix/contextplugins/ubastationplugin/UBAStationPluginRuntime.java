@@ -155,7 +155,13 @@ public class UBAStationPluginRuntime extends AutoReactiveContextPluginRuntime
     				stations2.remove(i);
     			}
     		}
-    		SecuredContextInfo aci= new SecuredContextInfo(new AmbientCarbonMonoxideContextInfo(stations2), PrivacyRiskLevel.MEDIUM);
+    		AmbientCarbonMonoxideContextInfo aci = new AmbientCarbonMonoxideContextInfo(stations2);
+    		double[] cov = aci.getCOValue();
+    		for(int i=0; i<cov.length; i++)
+    		{
+    			Log.i(TAG, cov[i]+" mg/m^3");
+    		}
+    		//SecuredContextInfo aci= new SecuredContextInfo(new AmbientCarbonMonoxideContextInfo(stations2), PrivacyRiskLevel.MEDIUM);
     		try 
     		{
     			Thread.sleep(60000);

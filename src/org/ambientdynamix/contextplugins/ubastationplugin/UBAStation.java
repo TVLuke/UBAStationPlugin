@@ -64,6 +64,7 @@ public class UBAStation extends Station
    		{
 			Log.i(TAG, "New Value");
 			double vx= Double.parseDouble(vv);
+			Log.i(TAG, "New Value: "+vx);
 			return vx;
    		}
    		return -999.0;
