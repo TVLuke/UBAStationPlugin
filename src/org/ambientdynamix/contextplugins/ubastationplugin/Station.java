@@ -100,9 +100,9 @@ public class Station implements Parcelable
 		stationaltitude=location.getAltitude();
     }
     
-    public double[] sense(double[] newvalues, ArrayList codes)
+    public double sense(String code)
     {
-    	return newvalues;
+    	return -999.0;
     }
     
 	@Override

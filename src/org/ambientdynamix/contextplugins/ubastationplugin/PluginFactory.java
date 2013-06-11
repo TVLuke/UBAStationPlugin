@@ -14,6 +14,6 @@ public class PluginFactory extends ContextPluginRuntimeFactory
 {
     public PluginFactory() 
     {
-    	super(AirPolutantsPluginRuntime.class, null, null);
+    	super(UBAStationPluginRuntime.class, null, UBAStationPluginConfigurationActivity.class);
     }
 }

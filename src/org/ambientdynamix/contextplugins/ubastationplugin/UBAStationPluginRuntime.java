@@ -37,9 +37,9 @@ import android.util.Log;
  * 
  * @author Lukas Ruge
  */
-public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime 
+public class UBAStationPluginRuntime extends AutoReactiveContextPluginRuntime 
 {
-    private final String TAG = this.getClass().getSimpleName();
+    private final String TAG = "UBAStation";
 	private boolean okToRun=true;
     private PowerScheme powerScheme;
     public static final String SAMPLE_DATA_KEY = "SAMPLE_DATA_KEY";
@@ -47,7 +47,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
     private static final int EVENT_VALID_MILLS = 5000;
 	private LocationManager locationManager;
 	private String provider;
-	private ArrayList stations = new ArrayList(); //this list will probably replace all the other station lists
+	private ArrayList<UBAStation> stations = new ArrayList<UBAStation>(); //this list will probably replace all the other station lists
 	private ArrayList codes = new ArrayList();
 	private ArrayList units = new ArrayList();
 	private ArrayList limits = new ArrayList();
@@ -55,12 +55,13 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 	private ArrayList states = new ArrayList();
 	Measurement[] values= new Measurement[5]; //values[1] = ozone; values[2] = Particulates...
     double[] distances = new double[5];
+    public static int throu =0;
     
 	@Override
     public void init(PowerScheme scheme, ContextPluginSettings settings) throws Exception 
     {
     		// Setup new state
-    		Log.i("Muhaha", "INIT");
+    		Log.i(TAG, "INIT");
     		this.setPowerScheme(scheme);
     		//set up values
     		for(int i=0; i<values.length; i++)
@@ -68,7 +69,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
     			Measurement m1 = new Measurement();
     			values[i]=m1; //-999.9 is the dafault value.
     		}
-    		Log.i("Muhaha", "whatup");
+    		Log.i(TAG, "whatup");
     		//Codes for Polutants
         	codes.add("PM1");//Particulates
         	units.add("mycro g/m^3");
@@ -87,21 +88,21 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
         	units.add("Âµg/m^3");
         	limits.add(200.0);
     		//set up station data
-    		states.add("BW");
-    		states.add("BY");
-    		states.add("BE");
-    		states.add("BB");
-    		states.add("HB");
+    		//states.add("BW");
+    		//states.add("BY");
+    		//states.add("BE");
+    		//states.add("BB");
+    		//states.add("HB");
     		states.add("HH");
-    		states.add("HE");
+    		//states.add("HE");
     		states.add("MV");
     		states.add("NI");
-    		states.add("RP");
-    		states.add("SL");
-    		states.add("SN");
-    		states.add("ST");
+    		//states.add("RP");
+    		//states.add("SL");
+    		//states.add("SN");
+    		//states.add("ST");
     		states.add("SH");
-    		states.add("TH");
+    		//states.add("TH");
     		states.add("UB");
     		new Thread(new Runnable() 
 	    	{
@@ -123,13 +124,13 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 		    // Since failed to load our settings, tell Dynamix we're not configured.
 			getPluginFacade().setPluginConfiguredStatus(getSessionId(), false);
 		}
-		//Log.i("Muhaha", "done with init");
+		//Log.i(TAG, "done with init");
     }
 
 	@Override
     public void start() 
     {
-		Log.i("Muhaha", "STAAAAAAARTS");
+		Log.i(TAG, "STAAAAAAARTS");
    		try 
 		{
 			Thread.sleep(5000); 
@@ -139,12 +140,50 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 			e.printStackTrace();
 		}
 		okToRun=true;
-		Log.i("Muhaha", "The wait is over");
+		Log.i(TAG, "The wait is over");
     	while(okToRun)
     	{
-    		Log.i("Muhaha", "OK TO RUN");
+    		Log.i(TAG, "okToRun");
+    		locationManager = (LocationManager) getSecuredContext().getSystemService(Context.LOCATION_SERVICE);
+    		Criteria crit = new Criteria();
+    		crit.setAccuracy(Criteria.ACCURACY_FINE);
+    		String provider = locationManager.getBestProvider(crit, true);
+    		Location loc = locationManager.getLastKnownLocation(provider);
+    		
+    		ArrayList<UBAStation> stations2 = new ArrayList<UBAStation>();
+    		stations2= (ArrayList<UBAStation>) stations.clone();
+    		
+    		int aNumber = 0;
+    		double distance=0.0;
+    		
+    		for(int i=stations2.size()-1; i>0; i--)
+    		{
+    			Station stationx = (Station) stations2.get(i);
+        		//Log.i(TAG, "b");
+    			//String thestation = (String) stationx.getStationID();
+        		//Log.i(TAG, thestation);
+    			Location stationloc=(Location) stationx.getLocation();
+    			//Log.i(TAG, "->");
+    			//Log.i(TAG, "->"+stationloc.getLatitude());
+    			double actualdistance = loc.distanceTo(stationloc);
+    			//Log.i(TAG, ""+actualdistance);
+    			if(actualdistance > 100000)
+    			{
+    				stations2.remove(i);
+    			}
+    		}
+    		SecuredContextInfo aci= new SecuredContextInfo(new AmbientCarbonMonoxideContextInfo(stations2), PrivacyRiskLevel.MEDIUM);
+    		try 
+    		{
+    			Thread.sleep(60000);
+    		}
+    		catch(Exception e)
+    		{
+    			Log.i(TAG, "Exception");
+    		}
+    		/**Log.i(TAG, "OK TO RUN");
 			boolean incomplete=true;
-    		Log.i("Muhaha", "OKTORUN="+okToRun);
+    		Log.i(TAG, "OKTORUN="+okToRun);
     		// Get the location manager
     		locationManager = (LocationManager) getSecuredContext().getSystemService(Context.LOCATION_SERVICE);
     		//Define the criteria how to select the locatioin provider -> use
@@ -156,18 +195,18 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
     		while((location==null && sn<500) || (location.getLatitude()==0.0 && location.getLongitude()==0.0))
     		{
     			sn++;
-    			Log.i("Muhaha", sn+" search for location");
+    			Log.i(TAG, sn+" search for location");
     			location = locationManager.getLastKnownLocation(provider);
     			if(sn==499)
     			{
     				location.setLatitude(53.83);
     				location.setLongitude(10.69);
-    				Log.i("Muhaha", "unable to get actual location.");
+    				Log.i(TAG, "unable to get actual location.");
     			}
     		}
-    		Log.i("Muhaha", "OKTORUNLLLKKK="+okToRun);
+    		Log.i(TAG, "OKTORUNLLLKKK="+okToRun);
     		//get the station that is closest
-    		Log.i("Muhaha", "got location"+location.getLatitude());
+    		Log.i(TAG, "got location"+location.getLatitude());
     		double distance=0.0;
     		int aNumber =0;
     		ArrayList stations2 = new ArrayList();
@@ -180,24 +219,24 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
     			newvalues[i]=-999.9; //default value
     		}
     		//the process is incomplete as long as there are values unset (if there are no stations left, the process is complete to)
-    		Log.i("Muhaha", "go");
-    		Log.i("Muhaha", "OKTORUNNNNN="+okToRun);
+    		Log.i(TAG, "go");
+    		Log.i(TAG, "OKTORUNNNNN="+okToRun);
     		while(incomplete)
     		{
     			aNumber=0;
     			distance=0.0;
-        		//Log.i("Muhaha", "a");
+        		//Log.i(TAG, "a");
 	    		for(int i=0; i<stations2.size(); i++)
 	    		{
 	    			Station stationx = (Station) stations2.get(i);
-	        		//Log.i("Muhaha", "b");
+	        		//Log.i(TAG, "b");
 	    			//String thestation = (String) stationx.getStationID();
-	        		//Log.i("Muhaha", thestation);
+	        		//Log.i(TAG, thestation);
 	    			Location stationloc=(Location) stationx.getLocation();
-	    			//Log.i("Muhaha", "->");
-	    			//Log.i("Muhaha", "->"+stationloc.getLatitude());
+	    			//Log.i(TAG, "->");
+	    			//Log.i(TAG, "->"+stationloc.getLatitude());
 	    			double actualdistance = location.distanceTo(stationloc);
-	    			//Log.i("Muhaha", ""+actualdistance);
+	    			//Log.i(TAG, ""+actualdistance);
 	    			if(distance==0.0 || actualdistance < distance)
 	    			{
 	    				distance = actualdistance;
@@ -205,15 +244,15 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 	    				aNumber=i;
 	    			}
 	    		}
-	    		//Log.i("Muhaha", ""+station+" "+distance);
+	    		//Log.i(TAG, ""+station+" "+distance);
     			//if the closest station is more then bla away, just stop looking
     			if(distance>60000)
     			{
     				incomplete=false;
-    	    		//Log.i("Muhaha", "fffffaaaaarrrr"+station);
+    	    		//Log.i(TAG, "fffffaaaaarrrr"+station);
     			}
 	    		//Here the readout happens
-	    		//Log.i("Muhaha", "readout"+station);
+	    		//Log.i(TAG, "readout"+station);
 	    		readout(newvalues, station, distance);
 	    		//then the stationname is deleted out of names2
 	    		stations2.remove(aNumber);
@@ -239,7 +278,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 	    		}
     		}
     		//put newvalues into values (unless its -999.9)
-    		Log.i("Muhaha", "OKTORUNaaaaa="+okToRun);
+    		Log.i(TAG, "OKTORUNaaaaa="+okToRun);
     		for(int i=0; i<newvalues.length; i++)
     		{
     			if(!(newvalues[i]==-999.9))
@@ -255,42 +294,77 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
     		try 
     		{
     			Thread.sleep(5000); //one minute
-    			Log.i("Muhaha", "high sleep");
+    			Log.i(TAG, "high sleep");
     			if(powerScheme == PowerScheme.BALANCED || powerScheme == PowerScheme.MANUAL)
     			{
     				Thread.sleep(295000); //five minutes
-    				Log.i("Muhaha", "balanced sleep");
+    				Log.i(TAG, "balanced sleep");
     			}
     			if(powerScheme == PowerScheme.POWER_SAVER)
     			{
     				Thread.sleep(10500000); //three hours
-    				Log.i("Muhaha", "saver sleep");
+    				Log.i(TAG, "saver sleep");
     			}
-        		Log.i("Muhaha", "OKTORUNererer="+okToRun);
+        		Log.i(TAG, "OKTORUNererer="+okToRun);
     		}
     		catch (Exception e) 
     		{
 				e.printStackTrace();
-				Log.i("Muhaha", "W00t Error");
+				Log.i(TAG, "W00t Error");
 			}
-    		Log.i("Muhaha", "OKTORUN="+okToRun);
-    		Log.i("Muhaha", "and..."+stations.size());
+    		Log.i(TAG, "OKTORUN="+okToRun);
+    		Log.i(TAG, "and..."+stations.size());**/
     	}
-    	Log.i("Muhaha", "out");
+    	Log.i(TAG, "out");
     }
 
     private void readout(double[] newvalues, Station station, double distance) 
     {
-		newvalues= station.sense(newvalues, codes);
+		//newvalues= station.sense(newvalues, codes);
     	//find the parts where it sais -999.9 in the distances but not in newvalues, change that to distance
 	}
 
 	@Override
-    public void handleContextRequest(UUID requestId, String contextDataType) 
+    public void handleContextRequest(UUID requestId, String contextInfoType) 
     {
 		/*
 		 * Perform context scan without configuration.
 		 */
+		locationManager = (LocationManager) getSecuredContext().getSystemService(Context.LOCATION_SERVICE);
+		Criteria crit = new Criteria();
+		crit.setAccuracy(Criteria.ACCURACY_FINE);
+		String provider = locationManager.getBestProvider(crit, true);
+		Location loc = locationManager.getLastKnownLocation(provider);
+		
+		ArrayList<UBAStation> stations2 = new ArrayList<UBAStation>();
+		stations2= (ArrayList<UBAStation>) stations.clone();
+		
+		int aNumber = 0;
+		double distance=0.0;
+		//get the closes station
+		for(int i=0; i<stations2.size(); i++)
+		{
+			Station stationx = (Station) stations2.get(i);
+    		//Log.i(TAG, "b");
+			//String thestation = (String) stationx.getStationID();
+    		//Log.i(TAG, thestation);
+			Location stationloc=(Location) stationx.getLocation();
+			//Log.i(TAG, "->");
+			//Log.i(TAG, "->"+stationloc.getLatitude());
+			double actualdistance = loc.distanceTo(stationloc);
+			//Log.i(TAG, ""+actualdistance);
+			if(distance==0.0 || actualdistance < distance)
+			{
+				distance = actualdistance;
+				aNumber=i;
+			}
+		}
+
+		if(contextInfoType.equals("org.ambientdynamix.contextplugins.context.info.environment.carbonmonoxide"))
+		{
+			//SecuredContextInfo aci= new SecuredContextInfo(new AmbientCarbonMonoxideContextInfo(stations.get(aNumber)), PrivacyRiskLevel.MEDIUM);
+			//sendContextEvent(requestId, aci, 1000000);
+		}
 	    pullEventHelper("", requestId, EVENT_VALID_MILLS);
     }
 
@@ -310,7 +384,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 		Thread t=Thread.currentThread();
 		t.interrupt();  
 		Log.d(TAG, "Stopped!");
-		Log.d("Muhaha", "Stopped!111");
+		Log.d(TAG, "Stopped!111");
     }
 
     @Override
@@ -348,10 +422,10 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
      */
     private void doPushContextDetection() 
     {
-		Log.i("Muhaha", "Entering doPushContextDetection");
+		Log.i(TAG, "Entering doPushContextDetection");
 	    // Send a sample broadcast event
 	    pushEventHelper("", EVENT_VALID_MILLS);
-	    Log.i("Muhaha", "Exiting doPushContextDetection");
+	    Log.i(TAG, "Exiting doPushContextDetection");
     }
 
 	/*
@@ -410,17 +484,18 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
     
     private void setupstaions() 
     {
-		Log.i("Muhaha", "Set Up Stations");
+		Log.i(TAG, "Set Up Stations");
 		for(int i=0; i<states.size(); i++)
     	{
-			Log.i("Muhaha", "outer for loop "+i);
+			Log.i(TAG, "outer for loop "+i);
     		String state=(String) states.get(i);
-    		//Log.i("Muhaha", state);
+    		//Log.i(TAG, state);
     		int code=1;
     		boolean more=true;
 	    	while(more && code<200)
 	    	{
-	    		Log.i("Muhaha", "while more "+code);
+	    		Log.i(TAG, "while more "+code);
+	    		throu++;
 	    		String stationcode="";
 	    		double vLogitude=0.0;
 	    		double vLatitude=0.0;
@@ -439,14 +514,14 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 	    			stationcode="DE"+state+""+code;
 	    		}
 	    		code++;
-	    		Log.i("Muhaha", "stationcode "+stationcode);
+	    		Log.i(TAG, "stationcode "+stationcode);
 	    		UBAStation station= new UBAStation(stationcode);
-	    		//Log.i("Muhaha", stationcode);
+	    		//Log.i(TAG, stationcode);
 		    	try
 				{
 		    		
 		    		String url = "http://www.env-it.de/stationen/public/download.do?event=downloadStation&stationcodeForDownload="+stationcode;
-		    		Log.i("Muhaha", "try "+url);
+		    		Log.i(TAG, "try "+url);
 					URL theurl = new URL(url);
 					URLConnection yc = theurl.openConnection();
 					BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
@@ -455,7 +530,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 					boolean documentstart=false;
 					while ((inputLine = in.readLine()) != null)
 					{	
-						//Log.i("Muhaha", "line "+inputLine);
+						//Log.i(TAG, "line "+inputLine);
 						boolean newsensor=false;
 						boolean relevant=true;
 						if(inputLine.contains("No accepted data"))
@@ -506,20 +581,20 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 								{
 									if(theline.contains("Stationsname"))
 									{
-										Log.i("Muhaha", "name");
+										Log.i(TAG, "name");
 										String stationname="";
 										while(tk.hasMoreTokens())
 										{
 											stationname=stationname+" "+tk.nextToken();
 											
 										}
-										Log.i("Muhaha", stationcode+">"+stationname);
+										Log.i(TAG, stationcode+">"+stationname);
 										station.setStationName(stationname);
-										Log.i("Muhaha", "station "+stationname);
+										Log.i(TAG, "station "+stationname);
 									}
 									if(theline.contains("Aktuelle Aktivitätsperiode: von"))
 									{
-										Log.i("Muhaha", "aktivität von");
+										Log.i(TAG, "aktivität von");
 										tk.nextToken();
 										tk.nextToken();
 										tk.nextToken();
@@ -528,7 +603,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									}
 									if(theline.contains("Aktuelle Aktivitätsperiode: bis"))
 									{
-										Log.i("Muhaha", "aktivität bis");
+										Log.i(TAG, "aktivität bis");
 										tk.nextToken();
 										tk.nextToken();
 										tk.nextToken();
@@ -540,35 +615,35 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 										{
 											open=true;
 											station.setactive(1);
-											Log.i("Muhaha", stationcode+"> open");
+											Log.i(TAG, stationcode+"> open");
 										}
 									}
 									if(theline.contains("Straße"))
 									{
-										Log.i("Muhaha", "straße");
+										Log.i(TAG, "straße");
 										String streetname="";
 										while(tk.hasMoreTokens())
 										{
 											streetname=streetname+" "+tk.nextToken();
 										}
 										station.setstreetadress(streetname);
-										Log.i("Muhaha", stationcode+">"+streetname);
+										Log.i(TAG, stationcode+">"+streetname);
 									}
 									if(theline.contains("PLZ"))
 									{
-										Log.i("Muhaha", "plz");
+										Log.i(TAG, "plz");
 										String zip=tk.nextToken();
 										station.setzipcode(zip);
 										tk.nextToken();
 										String city =tk.nextToken();
 										station.setcity(city);
-										Log.i("Muhaha", stationcode+">"+zip+","+city);
+										Log.i(TAG, stationcode+">"+zip+","+city);
 									}
 									if(theline.contains("Dezimal"))
 									{
-										Log.i("Muhaha", "dezimal");
+										Log.i(TAG, "dezimal");
 										String a= tk.nextToken();
-										//Log.i("Muhaha","a="+a);
+										//Log.i(TAG,"a="+a);
 										a = a.replace(",", ".");
 									    vLogitude = Double.parseDouble(a);
 									    String b = tk.nextToken();
@@ -578,10 +653,10 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									}
 									if(theline.contains("Höhe") && !(inputLine.contains("Höhe über")))
 									{
-										Log.i("Muhaha", "höhe");
+										Log.i(TAG, "höhe");
 										String a= tk.nextToken();
 										a = a.replace(",", ".");
-										//Log.i("Muhaha","a2="+a);
+										//Log.i(TAG,"a2="+a);
 									    vAltitude = Double.parseDouble(a);
 										//vv= tk.nextToken();
 									}
@@ -605,7 +680,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 											remark=remark+" "+tk.nextToken();
 										}
 										station.setremark(remark);
-										Log.i("Muhaha", stationcode+">"+remark);
+										Log.i(TAG, stationcode+">"+remark);
 									}
 									
 								}
@@ -616,14 +691,14 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 									{
 										s=s+" "+tk.nextToken();
 									}
-									Log.i("Muhaha", stationcode+">>"+s);
+									Log.i(TAG, stationcode+">>"+s);
 									sensorx=s;
 								}
 								if(!(sensorx.equals("")))
 								{
 									if(theline.contains("Messdauer") || inputLine.contains("Bezugszeitraum"))
 									{
-										Log.i("Muhaha", "Messdauer");
+										Log.i(TAG, "Messdauer");
 										String text="";
 										double period=0.0;
 										String aggregationMethod="";
@@ -640,7 +715,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 											
 										}
 										
-										Log.i("Muhaha", stationcode+">"+text);
+										Log.i(TAG, stationcode+">"+text);
 									}
 									if(theline.contains("Mess-/ Probenahmemethode"))
 									{
@@ -649,7 +724,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 										{
 											text=text+" "+tk.nextToken();
 										}
-										Log.i("Muhaha", stationcode+">"+text);
+										Log.i(TAG, stationcode+">"+text);
 									}
 									if(theline.contains("Messfrequenz") || inputLine.contains("Probenahmefrequenz"))
 									{
@@ -658,7 +733,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 										{
 											text=text+" "+tk.nextToken();
 										}
-										Log.i("Muhaha", stationcode+">"+text);
+										Log.i(TAG, stationcode+">"+text);
 									}
 								}
 							}
@@ -668,7 +743,7 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 				}
 				catch(Exception e)
 				{
-					Log.i("Muhaha", "exception");
+					Log.i(TAG, "exception");
 					vAltitude =-999;
 				}
 				if(more && vLatitude>0.0 && vLogitude>0.0 && !(vAltitude ==-999))
@@ -685,11 +760,11 @@ public class AirPolutantsPluginRuntime extends AutoReactiveContextPluginRuntime
 					//stationlocation.add(loc);
 					station.setLocation(loc);
 					stations.add(station);
-					Log.i("Muhaha", stationcode+" "+vLatitude+" "+vLogitude+" "+vAltitude);
+					Log.i(TAG, stationcode+" "+vLatitude+" "+vLogitude+" "+vAltitude);
 				}
 	    	}	
     	}
-		Log.i("Muhaha", ""+stations.size());
+		Log.i(TAG, ""+stations.size());
 		this.getPluginFacade().setPluginConfiguredStatus(getSessionId(), true);
 	}
 }

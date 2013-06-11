@@ -19,60 +19,56 @@ import android.util.Log;
 public class UBAStation extends Station
 {
 
+    private final String TAG = "UBAStation";
+    
 	public UBAStation(String id) 
 	{
 		super(id);
 	}
 
 	@Override
-	public double[] sense(double[] newvalues, ArrayList codes)
+	public double sense(String code)
 	{
     	//All the different codes for measurements
     	String state=getState(stationid);
     	//determine the State String based on the name of the station
-    	for(int i=0; i<codes.size(); i++) //do a readout of the sensors for every type of value
-    	{
-		    String vv="";
-    		try
-    		{
-	    		String url = "http://www.env-it.de/luftdaten/statedata.csv?comp="+codes.get(i)+"&state="+state;
-				URL theurl = new URL(url);
-				URLConnection yc = theurl.openConnection();
-				BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
-				String inputLine;
-				int linenumber=0;
-				while ((inputLine = in.readLine()) != null)
-				{	
-					StringTokenizer tk = new StringTokenizer(inputLine, ";");
-					while(tk.hasMoreTokens())
+	    String vv="";
+   		try
+   		{
+    		String url = "http://www.env-it.de/luftdaten/statedata.csv?comp="+code+"&state="+state;
+			URL theurl = new URL(url);
+			URLConnection yc = theurl.openConnection();
+			BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
+			String inputLine;
+			int linenumber=0;
+			while ((inputLine = in.readLine()) != null)
+			{	
+				StringTokenizer tk = new StringTokenizer(inputLine, ";");
+				while(tk.hasMoreTokens())
+				{
+					if(tk.nextToken().equals(stationid))
 					{
-						if(tk.nextToken().equals(stationid))
-						{
-							tk.nextToken();
-							vv= tk.nextToken();
-						}
+						tk.nextToken();
+						vv= tk.nextToken();
 					}
-					//System.out.println(inputLine);
 				}
-				in.close();
-    		}
-    		catch(Exception e)
-    		{
-    			
-    		}
-    		if(!(vv.equals(""))) //some value has been detected
-    		{
-    			if(newvalues[i]==-999.9) //there is no value in the array yet.
-    			{
-    				Log.i("Muhaha", "New Value");
-    				double vx= Double.parseDouble(vv);
-    				newvalues[i]=vx;//now there is.
-    			}
-    		}
-    	}
-    	return newvalues;
+				//System.out.println(inputLine);
+			}
+			in.close();
+   		}
+   		catch(Exception e)
+   		{
+   			
+   		}
+   		if(!(vv.equals(""))) //some value has been detected
+   		{
+			Log.i(TAG, "New Value");
+			double vx= Double.parseDouble(vv);
+			return vx;
+   		}
+   		return -999.0;
 	}
-
+	
 	private String getState(String station) 
 	{
 		if(station.startsWith("DEBW")) //Baden Württemberg
