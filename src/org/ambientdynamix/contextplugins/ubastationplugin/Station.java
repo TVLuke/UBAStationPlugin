@@ -93,6 +93,12 @@ public class Station implements Parcelable
     {
     	active=a;
     }
+    
+    public boolean isActive()
+    {
+    	return active==1;
+    }
+    
     public void setLocation(Location location)
     {
     	stationlatitude=location.getLatitude();

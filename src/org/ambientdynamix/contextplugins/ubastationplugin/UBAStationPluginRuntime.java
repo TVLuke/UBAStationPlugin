@@ -150,8 +150,7 @@ public class UBAStationPluginRuntime extends AutoReactiveContextPluginRuntime
     			//Log.i(TAG, "->"+stationloc.getLatitude());
     			double actualdistance = loc.distanceTo(stationloc);
     			Log.i(TAG, "distance="+actualdistance);
-    			
-    			if(actualdistance > 5000)
+    			if(actualdistance > 10000 || !stationx.isActive())
     			{
     				Log.i(TAG, "remove "+stations.get(i).getStationID());
     				stations2.remove(i);
