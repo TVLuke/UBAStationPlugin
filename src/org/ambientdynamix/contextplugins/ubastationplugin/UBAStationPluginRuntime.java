@@ -30,6 +30,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 /**
@@ -111,39 +112,21 @@ public class UBAStationPluginRuntime extends AutoReactiveContextPluginRuntime
 	    	    	setupstaions();
 	    	    }
 	    	}).start();
-		/*
-		 * Try to load our settings. Note: init can be called when we're NEW and INITIALIZED (during updates)
-		 */
-		if (loadSettings(settings)) 
-		{
-		    // Since we successfully loaded settings, tell Dynamix we're configured.
-			getPluginFacade().setPluginConfiguredStatus(getSessionId(), true);
-		}
-		else
-		{
-		    // Since failed to load our settings, tell Dynamix we're not configured.
-			getPluginFacade().setPluginConfiguredStatus(getSessionId(), false);
-		}
-		//Log.i(TAG, "done with init");
+			Thread t1 = new Thread( new BackendRunner());
+			t1.start();
     }
 
-	@Override
-    public void start() 
-    {
-		Log.i(TAG, "STAAAAAAARTS");
-   		try 
+	class BackendRunner implements Runnable
+	{
+		private Handler handler = new Handler();
+		private int delay=10000;
+		long counter=0;
+		
+		@Override
+		public void run() 
 		{
-			Thread.sleep(5000); 
-		}
-		catch (InterruptedException e) 
-		{
-			e.printStackTrace();
-		}
-		okToRun=true;
-		Log.i(TAG, "The wait is over");
-    	while(okToRun)
-    	{
-    		Log.i(TAG, "okToRun");
+			
+			Log.i(TAG, "okToRun");
     		locationManager = (LocationManager) getSecuredContext().getSystemService(Context.LOCATION_SERVICE);
     		Criteria crit = new Criteria();
     		crit.setAccuracy(Criteria.ACCURACY_FINE);
@@ -181,147 +164,23 @@ public class UBAStationPluginRuntime extends AutoReactiveContextPluginRuntime
     		{
     			Log.i(TAG, "Exception");
     		}
-    		/**Log.i(TAG, "OK TO RUN");
-			boolean incomplete=true;
-    		Log.i(TAG, "OKTORUN="+okToRun);
-    		// Get the location manager
-    		locationManager = (LocationManager) getSecuredContext().getSystemService(Context.LOCATION_SERVICE);
-    		//Define the criteria how to select the locatioin provider -> use
-    		// default
-    		Criteria criteria = new Criteria();
-    		provider = locationManager.getBestProvider(criteria, false);
-    		Location location=new Location("Airpolutantsplugin");
-    		int sn=0;
-    		while((location==null && sn<500) || (location.getLatitude()==0.0 && location.getLongitude()==0.0))
-    		{
-    			sn++;
-    			Log.i(TAG, sn+" search for location");
-    			location = locationManager.getLastKnownLocation(provider);
-    			if(sn==499)
-    			{
-    				location.setLatitude(53.83);
-    				location.setLongitude(10.69);
-    				Log.i(TAG, "unable to get actual location.");
-    			}
-    		}
-    		Log.i(TAG, "OKTORUNLLLKKK="+okToRun);
-    		//get the station that is closest
-    		Log.i(TAG, "got location"+location.getLatitude());
-    		double distance=0.0;
-    		int aNumber =0;
-    		ArrayList stations2 = new ArrayList();
-    		stations2=(ArrayList) stations.clone();
-    		Station station=new Station("FakeStation");
-    		incomplete=true;
-    		double[] newvalues = new double[values.length];
-    		for(int i=0; i<newvalues.length; i++)
-    		{
-    			newvalues[i]=-999.9; //default value
-    		}
-    		//the process is incomplete as long as there are values unset (if there are no stations left, the process is complete to)
-    		Log.i(TAG, "go");
-    		Log.i(TAG, "OKTORUNNNNN="+okToRun);
-    		while(incomplete)
-    		{
-    			aNumber=0;
-    			distance=0.0;
-        		//Log.i(TAG, "a");
-	    		for(int i=0; i<stations2.size(); i++)
-	    		{
-	    			Station stationx = (Station) stations2.get(i);
-	        		//Log.i(TAG, "b");
-	    			//String thestation = (String) stationx.getStationID();
-	        		//Log.i(TAG, thestation);
-	    			Location stationloc=(Location) stationx.getLocation();
-	    			//Log.i(TAG, "->");
-	    			//Log.i(TAG, "->"+stationloc.getLatitude());
-	    			double actualdistance = location.distanceTo(stationloc);
-	    			//Log.i(TAG, ""+actualdistance);
-	    			if(distance==0.0 || actualdistance < distance)
-	    			{
-	    				distance = actualdistance;
-	    				station = stationx;
-	    				aNumber=i;
-	    			}
-	    		}
-	    		//Log.i(TAG, ""+station+" "+distance);
-    			//if the closest station is more then bla away, just stop looking
-    			if(distance>60000)
-    			{
-    				incomplete=false;
-    	    		//Log.i(TAG, "fffffaaaaarrrr"+station);
-    			}
-	    		//Here the readout happens
-	    		//Log.i(TAG, "readout"+station);
-	    		readout(newvalues, station, distance);
-	    		//then the stationname is deleted out of names2
-	    		stations2.remove(aNumber);
-	    		//check if there is an unfilled value in the newvalues array
-	    		boolean unfilled = false;
-	    		for(int j=0; j<newvalues.length; j++)
-	    		{
-	    			if(newvalues[j]==-999.9)
-	    			{
-	    				unfilled=true;
-	    			}
-	    			else
-	    			{
-		    			if(distances[j]==0)
-		    			{
-		    				distances[j]=distance;
-		    			}
-	    			}
-	    		}
-	    		if(stations2.size()==0 || !unfilled)
-	    		{
-	    			incomplete=false;
-	    		}
-    		}
-    		//put newvalues into values (unless its -999.9)
-    		Log.i(TAG, "OKTORUNaaaaa="+okToRun);
-    		for(int i=0; i<newvalues.length; i++)
-    		{
-    			if(!(newvalues[i]==-999.9))
-    			{
-    				Date d = new Date();
-    				String ax=(String)codes.get(i);
-    				String bx = (String) units.get(i);
-    				//Here should be a check if a limit was exeeded, if so, there should be a push context, if not, not.
-    				values[i].update(ax, newvalues[i], bx, station, d, distances[i]);
-    			}
-    		}
-    		doPushContextDetection();
-    		try 
-    		{
-    			Thread.sleep(5000); //one minute
-    			Log.i(TAG, "high sleep");
-    			if(powerScheme == PowerScheme.BALANCED || powerScheme == PowerScheme.MANUAL)
-    			{
-    				Thread.sleep(295000); //five minutes
-    				Log.i(TAG, "balanced sleep");
-    			}
-    			if(powerScheme == PowerScheme.POWER_SAVER)
-    			{
-    				Thread.sleep(10500000); //three hours
-    				Log.i(TAG, "saver sleep");
-    			}
-        		Log.i(TAG, "OKTORUNererer="+okToRun);
-    		}
-    		catch (Exception e) 
-    		{
-				e.printStackTrace();
-				Log.i(TAG, "W00t Error");
+			
+			handler.removeCallbacks(this); // remove the old callback
+			if(okToRun)
+			{
+				handler.postDelayed(this, delay); // register a new one
 			}
-    		Log.i(TAG, "OKTORUN="+okToRun);
-    		Log.i(TAG, "and..."+stations.size());**/
-    	}
-    	Log.i(TAG, "out");
-    }
+		}
+		
+		public void onResume() 
+		{
+			handler.postDelayed(this, delay);
+		}
 
-    private void readout(double[] newvalues, Station station, double distance) 
-    {
-		//newvalues= station.sense(newvalues, codes);
-    	//find the parts where it sais -999.9 in the distances but not in newvalues, change that to distance
+		public void onPause() 
+		{
+			handler.removeCallbacks(this); // stop the map from updating
+		}
 	}
 
 	@Override
@@ -766,5 +625,12 @@ public class UBAStationPluginRuntime extends AutoReactiveContextPluginRuntime
     	}
 		Log.i(TAG, ""+stations.size());
 		this.getPluginFacade().setPluginConfiguredStatus(getSessionId(), true);
+	}
+
+	@Override
+	public void start() throws Exception 
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }
