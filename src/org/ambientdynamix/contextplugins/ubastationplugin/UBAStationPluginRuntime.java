@@ -149,12 +149,15 @@ public class UBAStationPluginRuntime extends AutoReactiveContextPluginRuntime
     			//Log.i(TAG, "->");
     			//Log.i(TAG, "->"+stationloc.getLatitude());
     			double actualdistance = loc.distanceTo(stationloc);
-    			//Log.i(TAG, ""+actualdistance);
-    			if(actualdistance > 100000)
+    			Log.i(TAG, "distance="+actualdistance);
+    			
+    			if(actualdistance > 60000)
     			{
+    				Log.i(TAG, "remove "+stations.get(i).getStationID());
     				stations2.remove(i);
     			}
     		}
+    		Log.i(TAG, "renaining "+stations2.size()+" stations.");
     		AmbientCarbonMonoxideContextInfo aci = new AmbientCarbonMonoxideContextInfo(stations2);
     		double[] cov = aci.getCOValue();
     		for(int i=0; i<cov.length; i++)
