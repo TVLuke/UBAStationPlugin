@@ -151,7 +151,7 @@ public class UBAStationPluginRuntime extends AutoReactiveContextPluginRuntime
     			double actualdistance = loc.distanceTo(stationloc);
     			Log.i(TAG, "distance="+actualdistance);
     			
-    			if(actualdistance > 60000)
+    			if(actualdistance > 5000)
     			{
     				Log.i(TAG, "remove "+stations.get(i).getStationID());
     				stations2.remove(i);
@@ -164,6 +164,7 @@ public class UBAStationPluginRuntime extends AutoReactiveContextPluginRuntime
     		{
     			Log.i(TAG, cov[i]+" mg/m^3");
     		}
+    		
     		//SecuredContextInfo aci= new SecuredContextInfo(new AmbientCarbonMonoxideContextInfo(stations2), PrivacyRiskLevel.MEDIUM);
     		try 
     		{
