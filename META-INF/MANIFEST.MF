@@ -6,8 +6,7 @@ Bundle-Name: Air Polutants Plugin
 Bundle-Vendor: Provider Name
 Import-Package: org.ambientdynamix.api.application,
  org.ambientdynamix.api.contextplugin,
- org.ambientdynamix.api.contextplugin.security,
- org.ambientdynamix.contextplugins.context.info.environment
+ org.ambientdynamix.api.contextplugin.security
 DynamicImport-Package: *
 Export-Package: org.ambientdynamix.contextplugins.ubastationplugin
 

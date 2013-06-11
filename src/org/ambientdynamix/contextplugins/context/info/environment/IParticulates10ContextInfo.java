@@ -7,7 +7,8 @@ import org.ambientdynamix.api.application.IContextInfo;
  * @author lukas
  *
  */
-public interface IParticulates10ContextInfo  extends IContextInfo{
+public interface IParticulates10ContextInfo  extends IContextInfo
+{
 
 	public abstract double[] getPM10Value();
 	
