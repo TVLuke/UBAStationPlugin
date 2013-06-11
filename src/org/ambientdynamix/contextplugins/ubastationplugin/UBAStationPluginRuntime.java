@@ -396,10 +396,15 @@ public class UBAStationPluginRuntime extends AutoReactiveContextPluginRuntime
 					while ((inputLine = in.readLine()) != null)
 					{	
 						//Log.i(TAG, "line "+inputLine);
+						if(code>190)
+						{
+							Log.i(TAG, inputLine);
+						}
 						boolean newsensor=false;
 						boolean relevant=true;
-						if(inputLine.contains("No accepted data"))
+						if(inputLine.contains("Es sind keine akzeptierten Daten vorhanden."))
 						{
+							more=false;
 							relevant=false;
 						}
 						if(inputLine.contains("Stationsname"))
