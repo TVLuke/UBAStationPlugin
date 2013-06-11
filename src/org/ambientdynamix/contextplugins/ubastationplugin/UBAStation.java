@@ -36,6 +36,7 @@ public class UBAStation extends Station
    		try
    		{
     		String url = "http://www.env-it.de/luftdaten/statedata.csv?comp="+code+"&state="+state;
+    		Log.i(TAG, "URL="+url);
 			URL theurl = new URL(url);
 			URLConnection yc = theurl.openConnection();
 			BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
